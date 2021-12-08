@@ -111,7 +111,7 @@ int main (){
     int duracao_total = 0;      //Armazena tempo total dos processos
     int break_flag = 0;
 
-    //Variaveis para calculos de Tempo Medio de Vida, Tempo Medio de Espera e Numero de Trocas de Contextos
+    //Variaveis para calculos de Tempo Medio de Espera, Tempo Medio de vida e Numero de Trocas de Contextos
     int onde_parou[count_proc];
     int soma_espera[count_proc];
     for(int i = 0; i < count_proc; i++){
