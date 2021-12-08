@@ -110,9 +110,15 @@ int main (){
     int tempo_print = 0;        //Variavel para print das linhas de tempo
     int duracao_total = 0;      //Armazena tempo total dos processos
     int break_flag = 0;
-    int espera = 0;             //Armazena a espera por processo
-    int med_espera[1]={0,0};    //Armazena a espera de cada processo e a quantidade de processos finalizados
-    int med_vida=0;
+
+    //Variaveis para calculos de Tempo Medio de Vida, Tempo Medio de Espera e Numero de Trocas de Contextos
+    int onde_parou[count_proc];
+    int soma_espera[count_proc];
+    for(int i = 0; i < count_proc; i++){
+        onde_parou[i] = geral[i].data;
+        soma_espera[i] = 0;
+    }
+    float med_vida=0;
     int trocas=0;               //Contabiliza trocas de contexto
     int processo_anterior = -1; //Variavel para controle de troca de contexto
 
@@ -157,9 +163,9 @@ int main (){
                         tempo_print = tempo;
                         tempo = tempo + atual[j].dur;                           //Passa tempo equvalente a duração pendente
 
-                        espera = tempo - atual[j].data - atual[j].dur;          //Calcula a espera do processo
-                        med_espera[0]=med_espera[0]+espera;
-                        med_espera[1]=med_espera[1]+1;
+                        soma_espera[j] = soma_espera[j] + tempo_print - onde_parou[j];  //Calcula a espera do processo
+                        onde_parou[j] = tempo + atual[j].dur;
+
                         med_vida=med_vida+(tempo-atual[j].data);                //Calcula a vida do processo e adiciona ao vetor de vida
 
                         for(int x = 0; x < atual[j].dur; x++){                  //Imprime diagrama de tempo de execução
@@ -180,6 +186,9 @@ int main (){
                     else{                               //Se quantum da fila não é suficiente para terminar, então desce a fila (i+1)
                         filas[i][j] = 0;
                         filas[i+1][j] = 1;
+
+                        soma_espera[j] = soma_espera[j] + tempo_print - onde_parou[j]; //Calcula a espera do processo
+                        onde_parou[j] = tempo + quantum[i];
 
                         tempo_print = tempo;
                         tempo = tempo + quantum[i];     //Passa tempo equivalente ao quantum
@@ -216,8 +225,13 @@ int main (){
         }
     }
 
-    printf("\nMedia de espera: %d\n", med_espera[0]/med_espera[1]); //Calcula e imprime a média de espera
-    printf("Media de vida: %d\n", med_vida/med_espera[1]); //Calcula e imprime a média de vida
+    float espera_med = 0;
+    for(int i = 0; i < count_proc; i++){
+        espera_med = espera_med + soma_espera[i];
+    }
+    espera_med = espera_med/count_proc;
+    printf("\nMedia de espera: %f\n", espera_med); //Imprime a média de espera
+    printf("Media de vida: %f\n", med_vida/count_proc); //Calcula e imprime a média de vida
     printf("Trocas de contexto: %d\n", trocas); //Imprime as trocas de contexto
 
 }
